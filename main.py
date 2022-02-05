@@ -20,7 +20,6 @@ from time import sleep
 
 from selenium import webdriver
 
-from FileCreation import dataInsertion
 from scrap_data import *
 
 
@@ -31,7 +30,6 @@ def main(driver: webdriver.Chrome):
     login_codezinger(driver, "e20cse215@bennett.edu.in", "humpydumpy")
     expand_all_labs(driver)
     data = get_data(driver)
-    dataInsertion(data)
 
 
 def driver_exists():
