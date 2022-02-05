@@ -14,13 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-import sys
-import traceback
-from time import sleep
+import os
 
-from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.utils import ChromeType
 
 from scrap_data import *
+
+os.environ['WDM_LOCAL'] = '1'
 
 
 def main(driver: webdriver.Chrome):
@@ -48,8 +49,8 @@ def driver_exists():
 
 
 if __name__ == '__main__':
-    driver_exists()
-    driver = webdriver.Chrome()
+    # driver_exists()
+    driver = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
     print("""DB-Hax  Copyright (C) 2021  RoguedBear, Ya-s-h
     This program comes with ABSOLUTELY NO WARRANTY; see COPYING
     This is free software, and you are welcome to redistribute it
