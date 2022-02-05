@@ -13,6 +13,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+import asyncio
+import json
 import traceback
 from datetime import datetime
 from pprint import pprint
@@ -20,6 +22,8 @@ from time import sleep
 from typing import List
 
 import selenium.webdriver.remote.webelement
+from pyppeteer import launch
+from pyppeteer.page import Page
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
@@ -31,6 +35,10 @@ PROBLEM_NUMBER_XPATH = "div[1]/button/span[2]"
 DUE_DATE_XPATH = "div[2]/div[1]/div/span/span[2]"
 STATUS_XPATH = "div[2]/div[4]/div/span[2]"
 DEBUG = False
+
+with open("xpaths.json") as file:
+    XPATHS = json.load(file)
+
 
 # ========
 
@@ -45,35 +53,33 @@ def main(driver: webdriver.Chrome):
     pprint(data)
 
 
-def login_codezinger(driver: webdriver.Chrome, username: str = "", password: str = ""):
-    driver.get("https://labs.codezinger.com/student/classes/611dc47ba6ae540012d2130f")
-
-    # Auto login
+async def login_codezinger(page: Page, username, password):
+    await page.goto('https://labs.codezinger.com/student/classes/611dc47ba6ae540012d2130f')
     if DEBUG or (username and password):
-        while "login" not in driver.title.lower():
+        while "login" not in (await page.title()).lower():
             sleep(1)
-        email = driver.find_element_by_xpath(
-                "/html/body/app/div[1]/main/ng-component/section/div/div[1]/div/div/form/div[1]/div/div/input")
-        email.send_keys(username)
-        pwd = driver.find_element_by_xpath(
-                "/html/body/app/div[1]/main/ng-component/section/div/div[1]/div/div/form/div[2]/div/div/input")
-        pwd.send_keys(password)
-        submit = driver.find_element_by_xpath(
-                "/html/body/app/div[1]/main/ng-component/section/div/div[1]/div/div/form/div[3]/div/button")
-        submit.click()
+
+        email = (await page.xpath(XPATHS["LOGIN_EMAIL_INPUT"]))[0]
+        # await email.click()
+        await email.type(username)
+        pwd = (await page.xpath(XPATHS["LOGIN_PASSWD_INPUT"]))[0]
+        # await pwd.click()
+        await pwd.type(password)
+        submit = (await page.xpath(XPATHS["LOGIN_SUBMIT_BTN"]))[0]
+        await submit.click()
         sleep(1)
         try:
-            yes = driver.find_element_by_xpath("/html/body/app/div[1]/main/ng-component/div/div/div/div[3]/button[2]")
-            yes.click()
-        except NoSuchElementException:
-            pass
-    # ------
+            yes = await page.xpath(XPATHS["LOGIN_FORCE_YES_BTN"])
+            print(yes)
+            await yes[0].click()
+        except Exception as ex:
+            traceback.print_exception(type(ex), ex, ex.__traceback__)
+            await page.close()
 
-    while "login" in driver.title.lower():
+    while "login" in (await page.title()).lower():
         sleep(1)
 
     print("logged in")
-    # driver.get("https://labs.codezinger.com/student/classes/611dc47ba6ae540012d2130f")
 
 
 def expand_all_labs(driver: webdriver.Chrome):
