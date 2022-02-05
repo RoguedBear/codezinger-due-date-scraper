@@ -82,13 +82,14 @@ async def login_codezinger(page: Page, username, password):
     print("logged in")
 
 
-def expand_all_labs(driver: webdriver.Chrome):
+async def expand_all_labs(page: Page):
     buttons = []
     while not buttons:
-        buttons = driver.find_elements_by_xpath(FOLDER_BUTTON_XPATH)
-    # print(buttons)
+        buttons = await page.xpath(XPATHS["FOLDER_BTN"])
     for button in buttons:
-        button.click()
+        while (await page.evaluate('node => node.getAttribute("aria-expanded")', button)) != 'true':
+            await button.click()
+            sleep(0.3)
     print("Expanded", len(buttons), "folders.")
 
 
