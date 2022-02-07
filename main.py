@@ -14,12 +14,35 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+import asyncio
+import os
 
-from scrap_data import *
+from dotenv import load_dotenv
+from get_docker_secret import get_docker_secret
+
+import scrap_data
+
+load_dotenv()
+
+config = dict()
+
+
+def load_config():
+    config["WEBHOOK_URL"] = get_docker_secret("WEBHOOK_URL", autocast_name=False)
+    config["email"] = get_docker_secret("EMAIL", autocast_name=False)
+    config["password"] = get_docker_secret("PASSWORD", autocast_name=False)
+    config["link"] = get_docker_secret("CODEZINGER_DASHBOARD", autocast_name=False)
+    config["chrome_path"] = os.getenv("CHROME_PATH", "")
+
+    print(config)
 
 
 def main():
     print("Hello World")
+    load_config()
+
+    data = asyncio.run(scrap_data.main(**config))
+    print(data)
 
 
 if __name__ == '__main__':

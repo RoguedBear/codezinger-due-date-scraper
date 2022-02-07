@@ -35,9 +35,10 @@ with open("xpaths.json") as file:
 
 # ========
 
-async def login_codezinger(page: Page, username, password):
+async def login_codezinger(page: Page, username, password, link=""):
     await set_cookies(page)
-    link = "https://labs.codezinger.com/student/dashboard"
+    if link == "":
+        link = "https://labs.codezinger.com/student/dashboard"
     await page.goto(link)
 
     if "login" not in (await page.title()).lower():
@@ -167,19 +168,20 @@ async def get_text(page: Page, element: ElementHandle):
     return await page.evaluate('(node) => node.textContent', element)
 
 
-async def main():
-    browser = await launch(executablePath=r"CHROME_PATH",
+async def main(email="", password="", chrome_path="", link="", **kwargs):
+    browser = await launch(executablePath=chrome_path,
                            headless=False)
     page = await browser.newPage()
     try:
-        await login_codezinger(page, "email", "password")
+        await login_codezinger(page, email, password, link)
         await sort_pending_by_due_date(page)
         await keep_clicking_load_more(page)
         output = await get_data(page)
         # await page.screenshot({'path': 'example.png'})
         await browser.close()
 
-        pprint(output)
+        # pprint(output)
+        return output
     except Exception as ex:
         traceback.print_exception(type(ex), ex, ex.__traceback__)
         await browser.close()
