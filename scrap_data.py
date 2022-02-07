@@ -21,21 +21,12 @@ from pprint import pprint
 from time import sleep
 from typing import List
 
-import selenium.webdriver.remote.webelement
 from pyppeteer import launch
 from pyppeteer.element_handle import ElementHandle
 from pyppeteer.page import Page
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
 
 # CONSTANTS
 
-FOLDER_BUTTON_XPATH = "/html/body/app/div[1]/main/ng-component/div[1]/div/problemset-tree/div[1]/div[2]/div/tree-root/tree-viewport/div/div/tree-node-collection/div/tree-node/div/tree-node-wrapper/div/div/div/div/button"
-QUESTIONS_XPATH = "/html/body/app/div[1]/main/ng-component/div[1]/div/problemset-tree/div[1]/div[2]/div/tree-root/tree-viewport/div/div/tree-node-collection/div/tree-node/div/tree-node-children/div/tree-node-collection/div/tree-node/div/tree-node-wrapper/div/div/div"
-QUESTION_TITLE_XPATH = "div[1]/button/span[4]"
-PROBLEM_NUMBER_XPATH = "div[1]/button/span[2]"
-DUE_DATE_XPATH = "div[2]/div[1]/div/span/span[2]"
-STATUS_XPATH = "div[2]/div[4]/div/span[2]"
 DEBUG = False
 
 with open("xpaths.json") as file:
@@ -43,17 +34,6 @@ with open("xpaths.json") as file:
 
 
 # ========
-
-
-def main(driver: webdriver.Chrome):
-    print("A new CHROME browser window will open with the codezinger link in it")
-    print("You have to enter your login and password.")
-    # input("Press enter to continue... ")
-    login_codezinger(driver)
-    expand_all_labs(driver)
-    data = get_data(driver)
-    pprint(data)
-
 
 async def login_codezinger(page: Page, username, password):
     await set_cookies(page)
@@ -94,28 +74,9 @@ async def login_codezinger(page: Page, username, password):
     await save_cookies(page)
 
 
-async def expand_all_labs(page: Page):
-    async def get_buttons():
-        return await page.querySelectorAll(".chapter-node > div > div > button")
-
-    buttons = []
-    while not buttons:
-        # buttons = await page.evaluate()
-        buttons = await get_buttons()
-    prev_len = len(buttons)
-    # input("PAUSED.")
-    for button in buttons:
-        while (await page.evaluate('node => node.getAttribute("aria-expanded")', button)) != 'true':
-            await button.click()
-            sleep(0.3)
-
-            # get new buttons if they exist
-    print("Expanded", len(buttons), "folders.")
-
-
 async def sort_pending_by_due_date(page: Page):
     pending_text_button = []
-    while pending_text_button == []:
+    while not pending_text_button:
         pending_text_button = await page.xpath(XPATHS["PENDING_DUE_DATE_FILTER"])
         sleep(0.1)
     pending_text = await page.evaluate('(node) => node.textContent', pending_text_button[0])
@@ -196,24 +157,23 @@ async def get_text(page: Page, element: ElementHandle):
     return await page.evaluate('(node) => node.textContent', element)
 
 
-def safe_find_element_by_xpath(element: selenium.webdriver.remote.webelement.WebElement, xpath: str) -> str:
-    result: str
+async def main():
+    browser = await launch(executablePath=r"CHROME_PATH",
+                           headless=False)
+    page = await browser.newPage()
     try:
-        result = element.find_element_by_xpath(xpath).text
-    except NoSuchElementException:
-        result = "NULL"
-    return result
+        await login_codezinger(page, "email", "password")
+        await sort_pending_by_due_date(page)
+        await keep_clicking_load_more(page)
+        output = await get_data(page)
+        # await page.screenshot({'path': 'example.png'})
+        await browser.close()
+
+        pprint(output)
+    except Exception as ex:
+        traceback.print_exception(type(ex), ex, ex.__traceback__)
+        await browser.close()
 
 
 if __name__ == '__main__':
-    driver = webdriver.Chrome()
-    try:
-        main(driver)
-        x = input("enter to close....")
-        if x:
-            raise KeyboardInterrupt
-    except KeyboardInterrupt:
-        driver.close()
-    except Exception as ex:
-        traceback.print_exception(type(ex), ex, ex.__traceback__)
-        driver.close()
+    asyncio.run(main())
