@@ -141,9 +141,12 @@ async def get_data(page: Page) -> List[dict]:
 
 async def set_cookies(page: Page):
     # try to load cookies and refresh
-    with open("cookies.json") as f:
-        cookies = json.load(f)
-    await page.setCookie(*cookies)
+    try:
+        with open("cookies.json") as f:
+            cookies = json.load(f)
+        await page.setCookie(*cookies)
+    except FileNotFoundError:
+        return
 
 
 async def save_cookies(page: Page):
