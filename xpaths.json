@@ -1,0 +1,14 @@
+{
+  "LOGIN_EMAIL_INPUT": "//*[@id=\"username\"]",
+  "LOGIN_PASSWD_INPUT": "//*[@id=\"password\"]",
+  "LOGIN_SUBMIT_BTN": "//*[@id=\"login\"]",
+  "LOGIN_FORCE_YES_BTN": "/html/body/app/div[1]/main/ng-component/div/div/div/div[3]/button[2]",
+  "PENDING_DUE_DATE_FILTER": "/html/body/app/div[1]/main/student-homepage/div[1]/div/div[2]/div[2]/div/div[1]/div/div[1]/div/button",
+  "PENDING_DUE_DATE_BTN": "/html/body/app/div[1]/main/student-homepage/div[1]/div/div[2]/div[2]/div/div[1]/div/div[1]/div/ul/li[1]/button",
+  "LOAD_MORE_BTN": "/html/body/app/div[1]/main/student-homepage/div[1]/div/div[2]/div[2]/div/div[2]/div/div/button",
+  "QUESTION_ROW": "/html/body/app/div[1]/main/student-homepage/div[1]/div/div[2]/div[2]/div/div[2]/div/table/tbody/tr",
+  "RELATIVE_QUESTION": "td[1]/div",
+  "RELATIVE_CLASS": "td[2]/div",
+  "RELATIVE_Q_TYPE": "td[3]/span/span[1]",
+  "RELATIVE_DUE_DATE": "td[4]/span"
+}
