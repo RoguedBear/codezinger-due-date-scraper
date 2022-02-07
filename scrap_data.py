@@ -54,8 +54,19 @@ def main(driver: webdriver.Chrome):
 
 
 async def login_codezinger(page: Page, username, password):
-    await page.goto('https://labs.codezinger.com/student/classes/611dc47ba6ae540012d2130f')
+    link = "https://labs.codezinger.com/student/classes/611dc47ba6ae540012d2130f"
+    await page.goto(link)
+
+    if "login" in (await page.title()).lower():
+        await set_cookies(page)
+        await page.goto(link)
+
+        if "login" not in (await page.title()).lower():
+            print("Logged in. allegedly")
+            return
+
     if DEBUG or (username and password):
+        print("Cookie login didn't work, trying manual login")
         while "login" not in (await page.title()).lower():
             sleep(1)
 
@@ -81,15 +92,25 @@ async def login_codezinger(page: Page, username, password):
 
     print("logged in")
 
+    await save_cookies(page)
+
 
 async def expand_all_labs(page: Page):
+    async def get_buttons():
+        return await page.querySelectorAll(".chapter-node > div > div > button")
+
     buttons = []
     while not buttons:
-        buttons = await page.xpath(XPATHS["FOLDER_BTN"])
+        # buttons = await page.evaluate()
+        buttons = await get_buttons()
+    prev_len = len(buttons)
+    # input("PAUSED.")
     for button in buttons:
         while (await page.evaluate('node => node.getAttribute("aria-expanded")', button)) != 'true':
             await button.click()
             sleep(0.3)
+
+            # get new buttons if they exist
     print("Expanded", len(buttons), "folders.")
 
 
@@ -127,6 +148,19 @@ def get_data(driver: webdriver.Chrome) -> List[dict]:
 
     return data_list
 
+
+async def set_cookies(page: Page):
+    # try to load cookies and refresh
+    with open("cookies.json") as f:
+        cookies = json.load(f)
+    await page.setCookie(*cookies)
+
+
+async def save_cookies(page: Page):
+    # save cookies
+    cookies = await page.cookies()
+    with open("cookies.json", "w") as file:
+        json.dump(cookies, file)
 
 def safe_find_element_by_xpath(element: selenium.webdriver.remote.webelement.WebElement, xpath: str) -> str:
     result: str
