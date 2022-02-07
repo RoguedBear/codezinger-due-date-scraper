@@ -75,16 +75,23 @@ async def login_codezinger(page: Page, username, password):
 
 
 async def sort_pending_by_due_date(page: Page):
-    pending_text_button = []
-    while not pending_text_button:
-        pending_text_button = await page.xpath(XPATHS["PENDING_DUE_DATE_FILTER"])
-        sleep(0.1)
-    pending_text = await page.evaluate('(node) => node.textContent', pending_text_button[0])
+    exception = True
+    while exception:
+        try:
+            exception = False
+            pending_text_button = []
+            while not pending_text_button:
+                pending_text_button = await page.xpath(XPATHS["PENDING_DUE_DATE_FILTER"])
+                sleep(0.1)
+            pending_text = await page.evaluate('(node) => node.textContent', pending_text_button[0])
 
-    if pending_text != "Pending By Due Date":
-        await pending_text_button[0].click()
-        due_by_pending_btn = (await page.xpath(XPATHS["PENDING_DUE_DATE_BTN"]))[0]
-        await due_by_pending_btn.click()
+            if pending_text != "Pending By Due Date":
+                await pending_text_button[0].click()
+                due_by_pending_btn = (await page.xpath(XPATHS["PENDING_DUE_DATE_BTN"]))[0]
+                await due_by_pending_btn.click()
+        except Exception as ex:
+            traceback.print_exception(type(ex), ex, ex.__traceback__)
+            exception = True
 
 
 async def keep_clicking_load_more(page: Page):
