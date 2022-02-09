@@ -139,7 +139,7 @@ async def get_data(page: Page) -> List[dict]:
         data_list.append({
             "question": await get_text(page, question_title[0]),
             "class": await get_text(page, codezinger_class[0]),
-            "question_type": "assignment" if (await get_text(page, question_type[0])) else "practise",
+            "question_type": await get_text(page, question_type[0]),
             "due_date": parsed_date
         })
     print("Scraped", len(questions), "questions")
