@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS question_data (
     class_name TEXT NOT NULL,
-    due_date TEXT,
+    due_date TIMESTAMP,
     question TEXT NOT NULL,
     question_type TEXT NOT NULL,
     primary_hash TEXT NOT NULL PRIMARY KEY,
