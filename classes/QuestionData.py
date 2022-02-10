@@ -19,11 +19,14 @@ class QuestionData:
             return self.class_name
 
     def __repr__(self) -> str:
+        if_exam = ""
+        if self.q_type == "E":
+            if_exam = "⚠⚠ EXAM: "
         if self.due_date != datetime.datetime.min:
             due = f"<t:{self.due_date.timestamp():.0f}:R>"
         else:
             due = "NEVAAAH <:nevah:785810983418593295>"
-        return f"{self.short_name} - {self.question} - due {due}"
+        return if_exam + f"{self.short_name} - {self.question} - due {due}"
 
     @classmethod
     def update_mapping_from_config(cls, config: dict):
