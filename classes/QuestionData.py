@@ -10,6 +10,7 @@ class QuestionData:
         self.class_name = class_name
         self.q_type = q_type
         self.due_date = due_date
+        self.__message_id = ""
 
     @property
     def short_name(self):
@@ -43,3 +44,14 @@ class QuestionData:
     @property
     def secondary_hash(self) -> str:
         return self._calculate_md5(self.class_name + self.question)
+
+    @property
+    def message_id(self) -> str:
+        return self.__message_id
+
+    @message_id.setter
+    def message_id(self, value: str):
+        if len(value) == 18:
+            self.__message_id = value
+        else:
+            raise ValueError("message id aka snowflake is of length 18!")

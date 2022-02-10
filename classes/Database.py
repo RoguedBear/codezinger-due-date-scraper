@@ -15,6 +15,7 @@ class dbopen(object):
     def __enter__(self):
         self.conn = sqlite3.connect(self.path, detect_types=sqlite3.PARSE_DECLTYPES |
                                                             sqlite3.PARSE_COLNAMES)
+        self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
         return self.cursor
 
@@ -52,6 +53,10 @@ class Database(dbopen):
                 question_data.class_name, question_data.due_date, question_data.question, question_data.q_type,
                 question_data.primary_hash, question_data.secondary_hash))
 
+            if question_data.message_id:  # this will always execute when in production
+                cursor.execute("INSERT INTO message_ids VALUES (?, ?);",
+                               (question_data.primary_hash, question_data.message_id))
+
     def remove(self, question_data: QuestionData):
         tables = ["question_data", "message_ids"]
         query = "DELETE FROM {} WHERE primary_hash = ?"
@@ -64,6 +69,24 @@ class Database(dbopen):
             cursor.execute("SELECT * FROM question_data WHERE primary_hash = ?", (question_data.primary_hash,))
             output = cursor.fetchall()
             assert len(output) == 0
+
+    def get_via_secondary_hash(self, hash: str) -> QuestionData:
+        """Returns QuestionData object retrieved via secondary hash"""
+        with self as cursor:
+            cursor.execute("SELECT * FROM question_data WHERE secondary_hash = ?", (hash,))
+            output = cursor.fetchone()
+            if output is None:
+                raise ValueError("No entry exists for secondary hash")
+
+            cursor.execute("SELECT message_id FROM message_ids WHERE primary_hash = ?", (output["primary_hash"], ))
+            message_id = cursor.fetchone()
+
+        question = dict(output)
+        question["q_type"] = question["question_type"]
+        del question["question_type"], question["primary_hash"], question["secondary_hash"]
+        q_data = QuestionData(**question)
+        q_data.message_id = message_id["message_id"]
+        return q_data
 
 
 if __name__ == '__main__':
@@ -91,3 +114,9 @@ if __name__ == '__main__':
     print("after modify, q secondary in db", q.secondary_hash in db)
     assert q.secondary_hash in db
     db.remove(q1)
+
+    print("====")
+    q.message_id = "123456789012345678"
+    db.insert(q)
+    print(db.get_via_secondary_hash(q.secondary_hash))
+    db.remove(q)
