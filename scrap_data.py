@@ -63,9 +63,10 @@ async def login_codezinger(page: Page, username, password, link=""):
             yes = await page.xpath(XPATHS["LOGIN_FORCE_YES_BTN"])
             print(yes)
             await yes[0].click()
-        except Exception as ex:
+        except IndexError as ex:
             traceback.print_exception(type(ex), ex, ex.__traceback__)
-            await page.close()
+            print("force login option not available...")
+            pass
 
     while "login" in (await page.title()).lower():
         sleep(1)
