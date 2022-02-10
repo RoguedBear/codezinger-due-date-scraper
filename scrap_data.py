@@ -189,4 +189,13 @@ async def main(email="", password="", chrome_path="", link="", **kwargs):
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    class DateTimeEncoder(json.JSONEncoder):
+        def default(self, z):
+            if isinstance(z, datetime):
+                return str(z)
+            else:
+                return super().default(z)
+    data = asyncio.run(main())
+
+    with open("test_data.json", "w") as file:
+        json.dump(data, file, cls=DateTimeEncoder)
