@@ -24,10 +24,10 @@ class dbopen(object):
 
 
 class Database(dbopen):
-    def __init__(self, path="question_data.db"):
-        super().__init__(path)
+    def __init__(self, path="question_data.db", schema_file="schema.sql", folder=""):
+        super().__init__(folder + path)
         with self as cursor:
-            with open("schema.sql") as schema:
+            with open(folder + schema_file) as schema:
                 cursor.executescript(schema.read())
 
     def __contains__(self, item: str):
@@ -75,15 +75,19 @@ if __name__ == '__main__':
 
     db = Database()
     print("Random key in db:", "abcd" in db)
+    assert "abcd" not in db
 
     q = QuestionData("question", "os", "A", datetime(year=2022, month=2, day=10))
     db.insert(q)
     print("new q in db", q.primary_hash in db)
+    assert q.primary_hash in db
 
     q1 = copy(q)
     q1.q_type = "P"
     db.remove(q)
     db.insert(q1)
     print("after modify, q in db:", q.primary_hash in db)
+    assert q.primary_hash not in db
     print("after modify, q secondary in db", q.secondary_hash in db)
+    assert q.secondary_hash in db
     db.remove(q1)
