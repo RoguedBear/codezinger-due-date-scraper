@@ -19,6 +19,17 @@ class QuestionData:
         else:
             return self.class_name
 
+    @property
+    def q_type_full(self) -> str:
+        if self.q_type == "A":
+            return "Assignment"
+        elif self.q_type == "P":
+            return "Practise"
+        elif self.q_type == "E":
+            return "Exam"
+        else:
+            return self.q_type
+
     def __repr__(self) -> str:
         if_exam = ""
         if self.q_type == "E":
@@ -27,7 +38,7 @@ class QuestionData:
             due = f"<t:{self.due_date.timestamp():.0f}:R>"
         else:
             due = "NEVAAAH <:nevah:785810983418593295>"
-        return if_exam + f"{self.short_name} - {self.question} - due {due}"
+        return if_exam + f"`{self.short_name} - {self.question}` - due **{due}**"
 
     @classmethod
     def update_mapping_from_config(cls, config: dict):
@@ -55,3 +66,22 @@ class QuestionData:
             self.__message_id = value
         else:
             raise ValueError("message id aka snowflake is of length 18!")
+
+    def diff(self, other: "QuestionData") -> str:
+        """
+        Compares this object and the other object and returns the difference
+        between them. could be due date change or question type change
+        :param other: QuestionData instance, assumes other is newer version of current object
+        :return: string name of the attribute differing
+        """
+        assert self.secondary_hash == other.secondary_hash, f"ERROR! \n'{self}' & '{other}' are not same"
+
+        difference = []
+        if self.q_type != other.q_type:
+            difference.append(f"Q type changed from `{self.q_type_full}` to `{other.q_type_full}`")
+        if self.due_date != other.due_date:
+            difference.append(
+                f"Due date changed from <t:{self.due_date.timestamp():.0f}:f> to <t:{other.due_date.timestamp():.0f}:f>"
+            )
+
+        return " & ".join(difference)
