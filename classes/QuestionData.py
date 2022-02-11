@@ -38,7 +38,7 @@ class QuestionData:
             due = f"<t:{self.due_date.timestamp():.0f}:R>"
         else:
             due = "NEVAAAH <:nevah:785810983418593295>"
-        return if_exam + f"`{self.short_name} - {self.question}` - due **{due}**"
+        return if_exam + f"{self.short_name} - {self.question} - due **{due}**"
 
     @classmethod
     def update_mapping_from_config(cls, config: dict):
@@ -78,10 +78,10 @@ class QuestionData:
 
         difference = []
         if self.q_type != other.q_type:
-            difference.append(f"Q type changed from `{self.q_type_full}` to `{other.q_type_full}`")
+            difference.append(f"**Q type changed** from `{self.q_type_full}` to `{other.q_type_full}`")
         if self.due_date != other.due_date:
             difference.append(
-                f"Due date changed from <t:{self.due_date.timestamp():.0f}:f> to <t:{other.due_date.timestamp():.0f}:f>"
+                f"**Due date changed** from <t:{self.due_date.timestamp():.0f}:f> to <t:{other.due_date.timestamp():.0f}:f>"
             )
 
         return " & ".join(difference)
