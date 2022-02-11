@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  codezingerbot:
+    container_name: codezinger-scraper
+    image: codezinger-due-date-scraper:latest
+    build: .
+    environment:
+      TZ: Asia/Calcutta
+      AVATAR_URL: https://cdn.discordapp.com/attachments/794508344441700382/935525972722188329/when_python_loses_Custom.png
+      WEBHOOK_USERNAME: dockerbone
+      CODEZINGER_DASHBOARD: https://labs.codezinger.com/student/dashboard
+
+    volumes:
+      - ./crontab.txt:/etc/codezinger-bot.d/jobs
+      - ./db.sqlite:/app/db/db.sqlite # to make the db persistent
+    secrets:
+      - WEBHOOK_URL
+      - EMAIL
+      - PASSWORD
+
+# Dont forget to do `chmod -R 400 secrets/` to make the files
+# read only for your user
+secrets:
+  WEBHOOK_URL:
+    file: ./secrets/webhook_url.txt
+  EMAIL:
+    file: ./secrets/email.txt
+  PASSWORD:
+    file: ./secrets/password.txt
