@@ -82,6 +82,7 @@ def process_new_questions(events: List[QuestionData], database: Database, webhoo
 
 def purge_old_questions(database: Database, webhook: Webhook):
     old_secondary_hashes = []
+    purged = 0
     with database as cursor:
         query = "SELECT secondary_hash FROM question_data WHERE due_date < ?"
         for output in cursor.execute(query, (datetime.datetime.now(),)):
@@ -92,6 +93,9 @@ def purge_old_questions(database: Database, webhook: Webhook):
         deleted = webhook.delete_message(old_event)
         if deleted:
             database.remove(old_event)
+            purged += 1
+    if purged > 0:
+        print("Purged", purged, "expired events")
 
 
 if __name__ == '__main__':
