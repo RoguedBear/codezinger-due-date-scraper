@@ -30,17 +30,18 @@ class Webhook:
                 retries -= 1
         return None
 
-    def send_message(self, question: Union[str, QuestionData], prepend_reason: str = "") -> str:
+    def send_message(self, question: Union[str, QuestionData], prepend_reason: str = "", append: str = "") -> str:
         """
         Sends the message passed or the string repr of QuestionData and returns the message id
         :param question:
         :param prepend_reason:
+        :param append:
         :return: message id
         """
         message = {
             "username": self.username,
             "avatar_url": self.avatar,
-            "content": prepend_reason + str(question)
+            "content": prepend_reason + str(question) + append
         }
         res = self.__send("post", self.url, json=message, params={"wait": True})
         if res is None:
