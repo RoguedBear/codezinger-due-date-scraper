@@ -47,8 +47,8 @@ def process_updated_questions(events: List[QuestionData], database: Database, we
         # if this fails, skip and move to next
         try:
             event.message_id = webhook.send_message(event,
-                                                    '`' + "-" * 30 + "`\nUPDATED: " + diff + "\n",
-                                                    '\n`' + "-" * 30 + '`')
+                                                    '`' + "—" * 30 + "`\nUPDATED: " + diff + "\n",
+                                                    '\n`' + "—" * 30 + '`')
         except ValueError:
             print("no message id received, skipping over: ", event, file=stderr)
         else:
