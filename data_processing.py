@@ -70,7 +70,7 @@ def process_new_questions(events: List[QuestionData], database: Database, webhoo
         if event.q_type == "P":
             continue
         try:
-            dashes = "`" + "-" * 30 + "`"
+            dashes = "" #"`" + "-" * 30 + "`"
             event.message_id = webhook.send_message(event, dashes + "\n", "\n" + dashes)
         except ValueError:
             print("no message id recieved, skipping over: ", event, file=stderr)
@@ -80,8 +80,22 @@ def process_new_questions(events: List[QuestionData], database: Database, webhoo
     print("Sent", __sent, "new webhook messages")
 
 
+def purge_old_questions(database: Database, webhook: Webhook):
+    old_secondary_hashes = []
+    with database as cursor:
+        query = "SELECT secondary_hash FROM question_data WHERE due_date < ?"
+        for output in cursor.execute(query, (datetime.datetime.now(),)):
+            old_secondary_hashes.append(output[0])
+
+    for hash_ in old_secondary_hashes:
+        old_event = database.get_via_secondary_hash(hash_)
+        deleted = webhook.delete_message(old_event)
+        if deleted:
+            database.remove(old_event)
+
+
 if __name__ == '__main__':
-    import os
+    import os, yaml
     from dotenv import load_dotenv
 
     load_dotenv()
@@ -107,6 +121,8 @@ if __name__ == '__main__':
                       avatar=os.getenv("AVATAR_URL"),
                       username="bone")
     process_data(data, db, webhook)
+
+    purge_old_questions(db, webhook)
 
     # input("> press to delete all webhooks")
     # with db as cursor:
