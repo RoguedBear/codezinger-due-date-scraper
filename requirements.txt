@@ -1,3 +1,4 @@
 get-docker-secret
-pyppeteer
-python-dotenv
+pyppeteer~=1.0.2
+python-dotenv~=0.19.2
+requests~=2.26.0
