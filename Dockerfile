@@ -16,14 +16,18 @@ COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 # Install pyppeteer chromium
-RUN pyppeteer-install
+# RUN pyppeteer-install
+RUN apk -U add chromium udev ttf-freefont
+ENV CHROME_PATH=/usr/bin/chromium-browser
 
-VOLUME /etc/codezinger-scraper.d
+VOLUME /etc/codezinger-bot.d/
 
 # copy project files
 WORKDIR /app
 COPY . .
 
 COPY entry.sh /entry.sh
-RUN chmod 755 /entry.sh
+COPY entrypoint.sh /entrypoint.sh
+# Todo fix these permissions, though im not sure if this will even impact anything
+RUN chmod 755 /entry.sh /entrypoint.sh
 CMD ["/entry.sh"]
