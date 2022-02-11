@@ -1,0 +1,5 @@
+mapping:
+  - name: "long lab/subject name"
+    short: short_name
+  - name: "long subject name 2"
+    short: short_name2
