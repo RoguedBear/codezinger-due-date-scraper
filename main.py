@@ -16,11 +16,17 @@
 """
 import asyncio
 import os
+import traceback
 
+import yaml
 from dotenv import load_dotenv
 from get_docker_secret import get_docker_secret
 
 import scrap_data
+from classes.Database import Database
+from classes.QuestionData import QuestionData
+from classes.Webhook import Webhook
+from data_processing import process_data, purge_old_questions
 
 load_dotenv()
 
@@ -33,20 +39,31 @@ def load_config():
     config["password"] = get_docker_secret("PASSWORD", autocast_name=False)
     config["link"] = get_docker_secret("CODEZINGER_DASHBOARD", autocast_name=False)
     config["chrome_path"] = os.getenv("CHROME_PATH", "")
+    config["AVATAR_URL"] = os.getenv("AVATAR_URL")
+    config["WEBHOOK_USERNAME"] = os.getenv("WEBHOOK_USERNAME")
 
-    print(config)
+    try:
+        with open("config.yml", "r", encoding="utf8") as config_file:
+            config["mapping"] = yaml.safe_load(config_file)
+            QuestionData.update_mapping_from_config(config["mapping"])
+            print("loaded short names")
+    except FileNotFoundError:
+        print("config file does not exist! Skipping mapping")
 
 
 def main():
-    print("Hello World")
     load_config()
+    # init webhook & Database
+    db = Database(folder="db/")
+    webhook = Webhook(config["WEBHOOK_URL"], config["AVATAR_URL"], config["WEBHOOK_USERNAME"])
 
     data = asyncio.run(scrap_data.main(**config))
-    print(data)
+    process_data(data, db, webhook)
+    purge_old_questions(db, webhook)
 
 
 if __name__ == '__main__':
-    print("""DB-Hax  Copyright (C) 2021  RoguedBear, Ya-s-h
+    print("""codezinger-due-date-scraper  Copyright (C) 2022  RoguedBear, Ya-s-h
     This program comes with ABSOLUTELY NO WARRANTY; see COPYING
     This is free software, and you are welcome to redistribute it
     under certain conditions; see COPYING""")
