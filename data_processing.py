@@ -30,21 +30,62 @@ def process_data(data: List[dict], database: Database, webhook: Webhook):
             new_questions.append(question)
 
     process_updated_questions(updated_questions, database, webhook)
-    process_new_questions(new_questions)
+    process_new_questions(new_questions, database, webhook)
 
 
 def process_updated_questions(events: List[QuestionData], database: Database, webhook: Webhook):
     if not events:
         return
-    
+    print("Processing updated events...")
+    __processed = 0
+    for event in events:
+        old_q = database.get_via_secondary_hash(event.secondary_hash)
+        diff = old_q.diff(event)
 
-def process_new_questions(events: List[QuestionData]):
+        # delete old message
+        webhook.delete_message(old_q)
+        # if this fails, skip and move to next
+        try:
+            event.message_id = webhook.send_message(event,
+                                                    "-" * 30 + "\nUPDATED: " + diff + "\n",
+                                                    '\n' + "-" * 30)
+        except ValueError:
+            print("no message id received, skipping over: ", event, file=stderr)
+        else:
+            # now delete old entry and add new entry
+            database.remove(old_q)
+            database.insert(event)
+            __processed += 1
+    print("Processed", __processed, "updated events")
+
+
+def process_new_questions(events: List[QuestionData], database: Database, webhook: Webhook):
     if not events:
         return
-    pass
+    print("Processing new events...")
+    events.sort(key=lambda x: x.due_date)
+    __sent = 0
+    for event in events:
+        # skip practise problems
+        if event.q_type == "P":
+            continue
+        try:
+            event.message_id = webhook.send_message(event)
+        except ValueError:
+            print("no message id recieved, skipping over: ", event, file=stderr)
+        else:
+            database.insert(event)
+            __sent += 1
+    print("Sent", __sent, "new webhook messages")
 
 
 if __name__ == '__main__':
+    import os
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+
     def date_hook(json_dict):
         for (key, value) in json_dict.items():
             if json_dict[key] == "0001-01-01 00:00:00":
@@ -61,4 +102,12 @@ if __name__ == '__main__':
         data = json.load(file, object_hook=date_hook)
     # print(data)
     db = Database(folder="db/")
-    process_data(data, db)
+    webhook = Webhook(os.getenv("WEBHOOK_URL"),
+                      avatar=os.getenv("AVATAR_URL"),
+                      username="bone")
+    process_data(data, db, webhook)
+
+    # input("> press to delete all webhooks")
+    # with db as cursor:
+    #     for msg_id in cursor.execute("SELECT message_id FROM message_ids"):
+    #         webhook.delete_message(str(msg_id))
