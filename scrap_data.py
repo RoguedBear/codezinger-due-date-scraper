@@ -166,12 +166,12 @@ async def save_cookies(page: Page):
 
 
 async def get_text(page: Page, element: ElementHandle):
-    return await page.evaluate('(node) => node.textContent', element)
+    return (await page.evaluate('(node) => node.textContent', element)).strip()
 
 
 async def main(email="", password="", chrome_path="", link="", **kwargs):
     browser = await launch(executablePath=chrome_path,
-                           headless=False)
+                           headless=True)
     page = await browser.newPage()
     try:
         await login_codezinger(page, email, password, link)
