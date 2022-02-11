@@ -30,16 +30,17 @@ class Webhook:
                 retries -= 1
         return None
 
-    def send_message(self, question: Union[str, QuestionData]) -> str:
+    def send_message(self, question: Union[str, QuestionData], prepend_reason: str = "") -> str:
         """
         Sends the message passed or the string repr of QuestionData and returns the message id
         :param question:
+        :param prepend_reason:
         :return: message id
         """
         message = {
             "username": self.username,
             "avatar_url": self.avatar,
-            "content": str(question)
+            "content": prepend_reason + str(question)
         }
         res = self.__send("post", self.url, json=message, params={"wait": True})
         if res is None:
@@ -48,7 +49,9 @@ class Webhook:
 
     def delete_message(self, question: Union[str, QuestionData]) -> bool:
         """
-        Deletes the message id
+        Deletes the message id. message is deleted when discord responds with
+        status code 204 or in case the message is already deleted, with status
+        code 10008
         :param question:
         :return: True if deleted, False otherwise
         """
@@ -61,7 +64,7 @@ class Webhook:
         if res is None:
             return False
         else:
-            return res.status_code == 204
+            return res.status_code == 204 or res.json().get("code", -1) == 10008
 
 
 if __name__ == '__main__':
@@ -82,6 +85,7 @@ if __name__ == '__main__':
     print(webhook.delete_message(x))
 
     q = QuestionData("question", "os", "A", datetime(year=2022, month=2, day=10))
-    q.message_id = webhook.send_message(q)
+    q.message_id = webhook.send_message(q, prepend_reason="CHANGED: test ")
     sleep(5)
-    webhook.delete_message(q)
+    assert webhook.delete_message(q) is True
+    assert webhook.delete_message(q) is True
