@@ -42,7 +42,15 @@ class QuestionData:
 
     @classmethod
     def update_mapping_from_config(cls, config: dict):
-        QuestionData.mapping = config.get("mapping", dict())
+        mapping_list: list = config.get("mapping", [])
+        mapping_dict = dict()
+        try:
+            for dict_ in mapping_list:
+                mapping_dict[dict_["name"]] = dict_["short"]
+        except KeyError:
+            print("INVALID mapping specified! no key 'name' or 'code'")
+        else:
+            QuestionData.mapping = mapping_dict
 
     @staticmethod
     def _calculate_md5(input_: str):
