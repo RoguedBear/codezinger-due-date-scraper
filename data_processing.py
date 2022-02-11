@@ -1,12 +1,14 @@
 import datetime
 import json
+from sys import stderr
 from typing import List
 
 from classes.Database import Database
 from classes.QuestionData import QuestionData
+from classes.Webhook import Webhook
 
 
-def process_data(data: List[dict], database: Database):
+def process_data(data: List[dict], database: Database, webhook: Webhook):
     new_questions: List[QuestionData] = []
     updated_questions: List[QuestionData] = []
 
@@ -15,7 +17,31 @@ def process_data(data: List[dict], database: Database):
         question["q_type"] = question["question_type"]
         del question["class"], question["question_type"]
         question = QuestionData(**question)
-        print(question, question.primary_hash)
+
+        # check if current event exists in database
+        if question.primary_hash in database:
+            continue
+        # check if secondary hash exists in db
+        elif question.secondary_hash in database:
+            # if yes, then the event was updated
+            updated_questions.append(question)
+        else:
+            # otherwise, this is a new event
+            new_questions.append(question)
+
+    process_updated_questions(updated_questions, database, webhook)
+    process_new_questions(new_questions)
+
+
+def process_updated_questions(events: List[QuestionData], database: Database, webhook: Webhook):
+    if not events:
+        return
+    
+
+def process_new_questions(events: List[QuestionData]):
+    if not events:
+        return
+    pass
 
 
 if __name__ == '__main__':
