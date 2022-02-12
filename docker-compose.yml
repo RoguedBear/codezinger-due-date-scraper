@@ -2,7 +2,7 @@ version: "3.9"
 services:
   codezingerbot:
     container_name: codezinger-scraper
-    image: codezinger-due-date-scraper:latest
+    image: ghcr.io/roguedbear/codezinger-due-date-scraper:latest
     build: .
     environment:
       TZ: Asia/Calcutta
