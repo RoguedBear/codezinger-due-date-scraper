@@ -1,1 +1,11 @@
-*/2 * * * * /entrypoint.sh
+# tuesday 8:30
+30 8 * * 2      /entrypoint.sh
+
+# Tuesday 10:40
+40 10 * * 2     /entrypoint.sh
+
+# Wednesday & Friday 14:35 & 16:35
+35 14,16 * * 3  /entrypoint.sh
+
+# At 12 on saturday
+0 12 * * 6      /entrypoint.sh
