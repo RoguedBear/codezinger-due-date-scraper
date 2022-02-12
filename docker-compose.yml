@@ -12,7 +12,7 @@ services:
 
     volumes:
       - ./crontab.txt:/etc/codezinger-bot.d/jobs
-      - ./db.sqlite:/app/db/question_data.db # to make the db persistent
+      - ${PWD}/db.db:/app/db/question_data.db # to make the db persistent
       - ./config.yml:/app/config.yml # if you dont have custom names, comment out this line
     secrets:
       - WEBHOOK_URL

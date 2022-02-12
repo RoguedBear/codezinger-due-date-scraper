@@ -15,10 +15,9 @@ point)
 - Deletes messages for questions past their due dates
 - Runs on-demand based on cron schedule
 
-## Demo 
+## Demo
 
 https://user-images.githubusercontent.com/39442192/153704089-c81d4fc1-d313-41ca-812c-5996ac38ff43.mp4
-
 
 ## Usage
 
@@ -44,6 +43,10 @@ https://user-images.githubusercontent.com/39442192/153704089-c81d4fc1-d313-41ca-
   - **`secrets/password.txt`**: this file will contain your password **in a
     single line**
 
+- now create an empty database file so docker compose can mount it:
+  ```bash
+  touch db.db
+  ```
 - Run the compose file: `docker-compose up -d`
 - now if you want, you can either delete the `secrets/` folder or change
   permissions of that folder to read-only for your user (or remove even that
