@@ -171,7 +171,8 @@ async def get_text(page: Page, element: ElementHandle):
 
 async def main(email="", password="", chrome_path="", link="", **kwargs):
     browser = await launch(executablePath=chrome_path,
-                           headless=True)
+                           headless=True,
+                           options={'args': ['--no-sandbox']})
     page = await browser.newPage()
     try:
         await login_codezinger(page, email, password, link)
@@ -193,7 +194,6 @@ if __name__ == '__main__':
     from dotenv import load_dotenv
 
     load_dotenv()
-
 
     class DateTimeEncoder(json.JSONEncoder):
         def default(self, z):
