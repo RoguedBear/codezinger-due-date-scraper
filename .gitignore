@@ -23,3 +23,4 @@ dataFile*.sql
 cookies.json
 .env
 db/question_data.db
+secrets
