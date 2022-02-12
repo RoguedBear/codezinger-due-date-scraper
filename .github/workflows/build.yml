@@ -6,13 +6,13 @@ on:
 
   # publish on pushes to the main branch (image tagged as "latest")
   push:
-    branches:
-      - master
-    paths:
-      - "**.py"
-      - "**.sh"
-      - "Dockerfile"
-      - ".github/workflows/build.yml"
+#     branches:
+#       - master
+#     paths:
+#       - "**.py"
+#       - "**.sh"
+#       - "Dockerfile"
+#       - ".github/workflows/build.yml"
   # allow manual triggers
   # workflow_dispatch:
 
