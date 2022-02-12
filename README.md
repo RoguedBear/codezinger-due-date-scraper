@@ -13,6 +13,12 @@ point)
 - Sends webhook messages sorted by due dates
 - Keeps track if a question's due date has been updated
 - Deletes messages for questions past their due dates
+- Runs on-demand based on cron schedule
+
+## Demo 
+
+https://user-images.githubusercontent.com/39442192/153704089-c81d4fc1-d313-41ca-812c-5996ac38ff43.mp4
+
 
 ## Usage
 
