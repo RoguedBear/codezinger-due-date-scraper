@@ -14,7 +14,7 @@ on:
       - "Dockerfile"
       - ".github/workflows/build.yml"
   # allow manual triggers
-  workflow_dispatch:
+  # workflow_dispatch:
 
 jobs:
   docker_publish:
