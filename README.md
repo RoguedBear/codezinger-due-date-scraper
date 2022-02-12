@@ -18,7 +18,7 @@ point)
 
 - Instead of cloning the repository, I suggest you download these 3 files in a
   folder:
-  - [`config.yml`](./config.yml)
+  - [`config.yml.EXAMPLE`](./config.yml.EXAMPLE)
   - [`docker-compose.yml`](./docker-compose.yml)
   - [`crontab.txt.EXAMPLE`](./crontab.txt.EXAMPLE) \
     (Rename `crontab.txt.EXAMPLE` to `crontab.txt`)
