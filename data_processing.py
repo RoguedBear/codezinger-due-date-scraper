@@ -3,7 +3,7 @@ import json
 from sys import stderr
 from typing import List
 
-from classes.Database import Database
+from classes.Database import Database, EventAlreadyLockedException
 from classes.QuestionData import QuestionData
 from classes.Webhook import Webhook
 
@@ -46,6 +46,8 @@ def process_updated_questions(events: List[QuestionData], database: Database, we
         webhook.delete_message(old_q)
         # if this fails, skip and move to next
         try:
+            # first lock this event
+            database.lock(event)
             # Sanity check if another instance didn't do stuff
             assert old_q.primary_hash in database, "old question has been purged probably by another instance."
             event.message_id = webhook.send_message(event,
@@ -55,11 +57,15 @@ def process_updated_questions(events: List[QuestionData], database: Database, we
             print("no message id received, skipping over: ", event, file=stderr)
         except AssertionError as e:
             print(e, file=stderr)
+        except EventAlreadyLockedException:
+            print("Another instance already locked", event.question)
         else:
             # now delete old entry and add new entry
             database.remove(old_q)
             database.insert(event)
             __processed += 1
+        finally:
+            database.unlock(event)
     print("Processed", __processed, "updated events")
 
 
@@ -69,12 +75,14 @@ def process_new_questions(events: List[QuestionData], database: Database, webhoo
     print("Processing new events...")
     events.sort(key=lambda x: x.due_date)
     __sent = 0
+    dashes = "" #"`" + "-" * 30 + "`"
     for event in events:
         # skip practise problems
         if event.q_type == "P":
             continue
         try:
-            dashes = "" #"`" + "-" * 30 + "`"
+            # Lock the current event first
+            database.lock(event)
             # sanity check if another instance didn't send the message already
             assert event.primary_hash not in database, "Another instance already sent this event's webhook"
             event.message_id = webhook.send_message(event, dashes + "\n", "\n" + dashes)
@@ -82,9 +90,13 @@ def process_new_questions(events: List[QuestionData], database: Database, webhoo
             print("no message id recieved, skipping over: ", event, file=stderr)
         except AssertionError as e:
             print(e, file=stderr)
+        except EventAlreadyLockedException:
+            print("Another instance already locked", event.question)
         else:
             database.insert(event)
             __sent += 1
+        finally:
+            database.unlock(event)
     print("Sent", __sent, "new webhook messages")
 
 
