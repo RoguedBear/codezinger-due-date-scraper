@@ -1,0 +1,54 @@
+version: "3.9"
+services:
+  codezingerbot-account1:
+    container_name: codezinger-scraper-account1
+    image: ghcr.io/roguedbear/codezinger-due-date-scraper:latest
+    build: .
+    environment:
+      TZ: Asia/Calcutta
+      AVATAR_URL: https://cdn.discordapp.com/emojis/861575999832719381.webp?size=128&quality=lossless
+      WEBHOOK_USERNAME: "boneless"
+      CODEZINGER_DASHBOARD: https://labs.codezinger.com/student/dashboard
+
+    volumes:
+      - ./crontab.txt:/etc/codezinger-bot.d/jobs
+      - ${PWD}/db.db:/app/db/question_data.db # to make the db persistent
+      - ./config.yml:/app/config.yml # if you dont have custom names, comment out this line
+    secrets:
+      - WEBHOOK_URL
+      - EMAIL
+      - PASSWORD
+  
+  codezingerbot-account2:
+    container_name: codezinger-scraper-account2
+    image: ghcr.io/roguedbear/codezinger-due-date-scraper:latest
+    build: .
+    environment:
+      TZ: Asia/Calcutta
+      AVATAR_URL: https://cdn.discordapp.com/emojis/861575999832719381.webp?size=128&quality=lossless
+      WEBHOOK_USERNAME: "boneless"
+      CODEZINGER_DASHBOARD: https://labs.codezinger.com/student/dashboard
+
+    volumes:
+      - ./crontab.txt:/etc/codezinger-bot.d/jobs
+      - ${PWD}/db.db:/app/db/question_data.db # to make the db persistent
+      - ./config.yml:/app/config.yml # if you dont have custom names, comment out this line
+    secrets:
+      - WEBHOOK_URL
+      - source: EMAIL-acc2
+        target: EMAIL
+      - target: PASSWORD
+        source: PASSWORD-acc2
+# Dont forget to do `chmod -R 400 secrets/` to make the files
+# read only for your user
+secrets:
+  WEBHOOK_URL:
+    file: ./secrets/webhook_url.txt
+  EMAIL:
+    file: ./secrets/email.txt
+  PASSWORD:
+    file: ./secrets/password.txt
+  EMAIL-acc2:
+    file: ./secrets/2/email.txt
+  PASSWORD-acc2:
+    file: ./secrets/2/password.txt
