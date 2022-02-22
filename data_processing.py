@@ -46,11 +46,15 @@ def process_updated_questions(events: List[QuestionData], database: Database, we
         webhook.delete_message(old_q)
         # if this fails, skip and move to next
         try:
+            # Sanity check if another instance didn't do stuff
+            assert old_q.primary_hash in database, "old question has been purged probably by another instance."
             event.message_id = webhook.send_message(event,
                                                     '`' + "—" * 30 + "`\nUPDATED: " + diff + "\n",
                                                     '\n`' + "—" * 30 + '`')
         except ValueError:
             print("no message id received, skipping over: ", event, file=stderr)
+        except AssertionError as e:
+            print(e, file=stderr)
         else:
             # now delete old entry and add new entry
             database.remove(old_q)
@@ -71,9 +75,13 @@ def process_new_questions(events: List[QuestionData], database: Database, webhoo
             continue
         try:
             dashes = "" #"`" + "-" * 30 + "`"
+            # sanity check if another instance didn't send the message already
+            assert event.primary_hash not in database, "Another instance already sent this event's webhook"
             event.message_id = webhook.send_message(event, dashes + "\n", "\n" + dashes)
         except ValueError:
             print("no message id recieved, skipping over: ", event, file=stderr)
+        except AssertionError as e:
+            print(e, file=stderr)
         else:
             database.insert(event)
             __sent += 1
