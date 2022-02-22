@@ -4,6 +4,10 @@ from typing import Union
 from classes.QuestionData import QuestionData
 
 
+class EventAlreadyLockedException(Exception):
+    pass
+
+
 class dbopen(object):
     """
     Simple CM for sqlite3 databases. Commits everything at exit.
@@ -78,7 +82,7 @@ class Database(dbopen):
             if output is None:
                 raise ValueError("No entry exists for secondary hash")
 
-            cursor.execute("SELECT message_id FROM message_ids WHERE primary_hash = ?", (output["primary_hash"], ))
+            cursor.execute("SELECT message_id FROM message_ids WHERE primary_hash = ?", (output["primary_hash"],))
             message_id = cursor.fetchone()
 
         question = dict(output)
@@ -87,6 +91,26 @@ class Database(dbopen):
         q_data = QuestionData(**question)
         q_data.message_id = message_id["message_id"]
         return q_data
+
+    def lock(self, event: QuestionData) -> bool:
+        """
+        Locks the passed event by storing it in db for other instances to see
+        raises exception if event is already present aka already locked
+        """
+        try:
+            with self as cursor:
+                cursor.execute("INSERT INTO lock VALUES (?)", (event.primary_hash, ))
+        except sqlite3.IntegrityError:
+            raise EventAlreadyLockedException
+        else:
+            return True
+
+    def unlock(self, event: QuestionData):
+        """
+        Removes the locked event.
+        """
+        with self as cursor:
+            cursor.execute("DELETE FROM lock WHERE primary_hash = ?", (event.primary_hash,))
 
 
 if __name__ == '__main__':

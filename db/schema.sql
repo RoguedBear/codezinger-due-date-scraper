@@ -12,3 +12,7 @@ CREATE TABLE IF NOT EXISTS message_ids (
     message_id TEXT NOT NULL,
     FOREIGN KEY (primary_hash) REFERENCES question_data(primary_hash)
 );
+
+CREATE TABLE IF NOT EXISTS lock (
+    primary_hash TEXT NOT NULL PRIMARY KEY
+);
