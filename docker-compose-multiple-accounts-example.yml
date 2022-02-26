@@ -4,6 +4,7 @@ services:
     container_name: codezinger-scraper-account1
     image: ghcr.io/roguedbear/codezinger-due-date-scraper:latest
     build: .
+    restart: unless-stopped
     environment:
       TZ: Asia/Calcutta
       AVATAR_URL: https://cdn.discordapp.com/emojis/861575999832719381.webp?size=128&quality=lossless
@@ -23,6 +24,7 @@ services:
     container_name: codezinger-scraper-account2
     image: ghcr.io/roguedbear/codezinger-due-date-scraper:latest
     build: .
+    restart: unless-stopped
     environment:
       TZ: Asia/Calcutta
       AVATAR_URL: https://cdn.discordapp.com/emojis/861575999832719381.webp?size=128&quality=lossless

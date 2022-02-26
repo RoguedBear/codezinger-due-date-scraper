@@ -2,8 +2,9 @@ version: "3.9"
 services:
   codezingerbot:
     container_name: codezinger-scraper
-    image: ghcr.io/roguedbear/codezinger-due-date-scraper:latest
+    image: ghcr.io/roguedbear/codezinger-due-date-scraper:2.0.2
     build: .
+    restart: unless-stopped
     environment:
       TZ: Asia/Calcutta
       AVATAR_URL: https://cdn.discordapp.com/attachments/794508344441700382/935525972722188329/when_python_loses_Custom.png
