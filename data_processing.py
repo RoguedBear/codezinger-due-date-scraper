@@ -109,11 +109,17 @@ def purge_old_questions(database: Database, webhook: Webhook):
             old_secondary_hashes.append(output[0])
 
     for hash_ in old_secondary_hashes:
-        old_event = database.get_via_secondary_hash(hash_)
-        deleted = webhook.delete_message(old_event)
-        if deleted:
-            database.remove(old_event)
-            purged += 1
+        try:
+            old_event = database.get_via_secondary_hash(hash_)
+        except ValueError:
+            print("another instance already deleted", hash_)
+            continue
+        else:
+            deleted = webhook.delete_message(old_event)
+            if deleted:
+                database.remove(old_event)
+                purged += 1
+
     if purged > 0:
         print("Purged", purged, "expired events")
 
