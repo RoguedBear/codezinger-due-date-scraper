@@ -71,3 +71,7 @@ if __name__ == '__main__':
         main()
     except Exception as ex:
         traceback.print_exception(type(ex), ex, ex.__traceback__)
+        # incase stderr isn't shown in portainer or the traceback thing isn't working
+        print(ex)
+
+    print("Finished, exiting...")
