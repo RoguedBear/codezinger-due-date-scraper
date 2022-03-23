@@ -175,11 +175,17 @@ async def main(email="", password="", chrome_path="", link="", **kwargs):
         browser = await launch(executablePath=chrome_path,
                                headless=True,
                                options={'args': ['--no-sandbox']})
+        print("browser started")
         page = await browser.newPage()
+        print("logging in.")
         await login_codezinger(page, email, password, link)
+        print("sorting")
         await sort_pending_by_due_date(page)
+        print("loading more")
         await keep_clicking_load_more(page)
+        print("Processing stuff")
         output = await get_data(page)
+        print("awaiting browser close")
         # await page.screenshot({'path': 'example.png'})
         await browser.close()
 
