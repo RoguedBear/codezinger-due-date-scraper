@@ -174,7 +174,7 @@ async def main(email="", password="", chrome_path="", link="", **kwargs):
         print("Starting browser...")
         browser = await launch(executablePath=chrome_path,
                                headless=True,
-                               options={'args': ['--no-sandbox']})
+                               options={'args': ['--no-sandbox', '--disable-gpu']})
         print("browser started")
         page = await browser.newPage()
         print("logging in.")
