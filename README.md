@@ -23,15 +23,36 @@ https://user-images.githubusercontent.com/39442192/153704089-c81d4fc1-d313-41ca-
 
 - Instead of cloning the repository, I suggest you download these 3 files in a
   folder:
+
   - [`config.yml.EXAMPLE`](./config.yml.EXAMPLE)
   - [`docker-compose.yml`](./docker-compose.yml)
   - [`crontab.txt.EXAMPLE`](./crontab.txt.EXAMPLE) \
     (Rename `crontab.txt.EXAMPLE` to `crontab.txt`)
-- You can now change the mapping in `config.yml` or your cron schedule in
-  `crontab.txt`
+
+- Now you can customise the bot to your needs:
+
+  - #### Creating a friendly name (that'll be used in discord) for your codezinger class
+
+    - You can now change the mapping in `config.yml`
+    - the `name` field in the `config.yml` is the full class name you see in
+      codezinger
+    - tip to find the full length class names with some effort: \
+      run the bot without any mapping first, then the due date message it sends over
+      on discord you'll see the the long name of your class in the message, you can
+      use that to create the mapping as per the format in `config.yaml`
+
+  - #### Set your cron schedule in `crontab.txt`
+    - This schedule you define here is when the bot will trigger the python
+      script to scrape the data.
+    - I've set the my timings in my instance to be 5 minutes after my lab class
+      starts, and 5-10 minutes after it ends on those days. You could for
+      example schedule the bot to run daily at a convenient/inactive time like 3
+      am.
+    - lookup on the internet on how to define cron schedules if you're new to
+      that and/or refer mine in [`crontab.txt.EXAMPLE`](./crontab.txt.EXAMPLE).
+
 - Since you also need to specify your webhook url, your codezinger email &
-  password, you need to create 3 files in a new folder `secrets/` created you
-  have downloaded the above files
+  password, you need to create 3 files in a new folder `secrets/`
 
   - **`secrets/webhook_url.txt`**: this file will contain your discord webhook
     **in a single line**
@@ -55,9 +76,9 @@ https://user-images.githubusercontent.com/39442192/153704089-c81d4fc1-d313-41ca-
   chmod -R 400 secrets/ # for read-only to your user
   chmod -R 000 secrets/ # experimental security
   ```
-  NOTE: if you delete your secrets folder and need to update something, you'd
-  have to run `docker-compose up -d` again which _could_ require the secrets
-  folder to be accessible again.
+  NOTE: if you delete your secrets folder and need to update anything in the
+  `docker-compose.yml` file, you'd have to run `docker-compose up -d` again
+  which _could_ require the `secrets/` folder to be accessible again.
 
 ## License
 
