@@ -22,7 +22,8 @@ https://user-images.githubusercontent.com/39442192/153704089-c81d4fc1-d313-41ca-
 ## Usage
 
 - Instead of cloning the repository, I suggest you download these 3 files in a
-  folder:
+  folder (preferrably from the [release](https://github.com/RoguedBear/codezinger-due-date-scraper/releases/latest)
+  page):
 
   - [`config.yml.EXAMPLE`](./config.yml.EXAMPLE)
   - [`docker-compose.yml`](./docker-compose.yml)
