@@ -3,9 +3,9 @@ name: upload draft
 on:
   release:
     types: [published, created]
-  push:
-    paths:
-      - ".github/workflows/release.yml"
+  # push:
+  #   paths:
+  #     - ".github/workflows/release.yml"
 
 jobs:
   upload-files:
