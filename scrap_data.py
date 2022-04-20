@@ -170,23 +170,32 @@ async def get_text(page: Page, element: ElementHandle):
 
 
 async def main(email="", password="", chrome_path="", link="", **kwargs):
-    browser = await launch(executablePath=chrome_path,
-                           headless=True,
-                           options={'args': ['--no-sandbox']})
-    page = await browser.newPage()
     try:
+        print("Starting browser...")
+        browser = await launch(executablePath=chrome_path,
+                               headless=True,
+                               options={'args': ['--no-sandbox', '--disable-gpu']})
+        print("browser started")
+        page = await browser.newPage()
+        print("logging in.")
         await login_codezinger(page, email, password, link)
+        print("sorting")
         await sort_pending_by_due_date(page)
+        print("loading more")
         await keep_clicking_load_more(page)
+        print("Processing stuff")
         output = await get_data(page)
+        print("awaiting browser close")
         # await page.screenshot({'path': 'example.png'})
         await browser.close()
 
+        print("Browser closed")
         # pprint(output)
         return output
     except Exception as ex:
         traceback.print_exception(type(ex), ex, ex.__traceback__)
         await browser.close()
+        print("ERROR! (browser closed), ", ex)
 
 
 if __name__ == '__main__':
