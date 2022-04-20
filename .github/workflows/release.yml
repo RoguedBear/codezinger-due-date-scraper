@@ -1,0 +1,33 @@
+name: upload draft
+
+on:
+  release:
+    types: [published, created]
+  push:
+    paths:
+      - ".github/workflows/release.yml"
+
+jobs:
+  upload-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: echo ${{ github.sha }} > Release.txt
+
+      - name: rename one file
+        run: for file in *.EXAMPLE ; do mv "$file" "${file#.EXAMPLE}" ; done
+
+      - name: test if it worked
+        run: ls -l
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            config.yml.EXAMPLE
+            crontab.txt.EXAMPLE
+            docker-compose.yml
+            docker-compose-multiple-accounts-example.yml
