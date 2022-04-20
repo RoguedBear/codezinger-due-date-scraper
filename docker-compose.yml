@@ -2,7 +2,7 @@ version: "3.9"
 services:
   codezingerbot:
     container_name: codezinger-scraper
-    image: ghcr.io/roguedbear/codezinger-due-date-scraper:2.0.2
+    image: ghcr.io/roguedbear/codezinger-due-date-scraper:2.0.3
     build: .
     restart: unless-stopped
     environment:

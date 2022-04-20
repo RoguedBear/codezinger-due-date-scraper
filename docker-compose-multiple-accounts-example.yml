@@ -2,7 +2,7 @@ version: "3.9"
 services:
   codezingerbot-account1:
     container_name: codezinger-scraper-account1
-    image: ghcr.io/roguedbear/codezinger-due-date-scraper:latest
+    image: ghcr.io/roguedbear/codezinger-due-date-scraper:2.0.3
     build: .
     restart: unless-stopped
     environment:
@@ -19,10 +19,10 @@ services:
       - WEBHOOK_URL
       - EMAIL
       - PASSWORD
-  
+
   codezingerbot-account2:
     container_name: codezinger-scraper-account2
-    image: ghcr.io/roguedbear/codezinger-due-date-scraper:latest
+    image: ghcr.io/roguedbear/codezinger-due-date-scraper:2.0.3
     build: .
     restart: unless-stopped
     environment:
