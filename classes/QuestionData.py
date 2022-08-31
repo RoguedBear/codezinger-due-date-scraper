@@ -70,10 +70,17 @@ class QuestionData:
 
     @message_id.setter
     def message_id(self, value: str):
-        if len(value) == 18:
-            self.__message_id = value
+        try:
+            # check if snowflake can be converted to a valid datetime
+            # https://discord.com/developers/docs/reference#snowflakes
+            datetime.datetime.fromtimestamp(
+                ((int(value) >> 22) + 1420070400000) / 1000
+            )
+        except OSError:
+            raise ValueError(
+                "message id aka snowflake cannot be converted to a valid datetime")
         else:
-            raise ValueError("message id aka snowflake is of length 18!")
+            self.__message_id = value
 
     def diff(self, other: "QuestionData") -> str:
         """
