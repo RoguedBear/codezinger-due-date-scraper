@@ -8,6 +8,13 @@ sends them to a discord channel via webhooks.
 point)
 </sub>
 
+## ⚠⚠ End Of Life notice
+since my uni has moved away from using this platform, it wouldnt be possible for me to use or maintain this project.
+This bot has been very helpful to me for the time it was running, and I learnt, played around with and implemented
+alot of new things while making and maintaining it<3
+
+Maybe look around for a same project in the future, adapted to the new platform being used by my uni?
+
 ## Features:
 
 - Sends webhook messages sorted by due dates
