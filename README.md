@@ -67,7 +67,7 @@ https://user-images.githubusercontent.com/39442192/153704089-c81d4fc1-d313-41ca-
   - **`secrets/email.txt`**: this file will contain your email **in a single
     line**. example:
     ```txt
-    e20cse215@bennett.edu.in
+    john.doe@example.com
     ```
   - **`secrets/password.txt`**: this file will contain your password **in a
     single line**
